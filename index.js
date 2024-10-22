@@ -56,16 +56,18 @@ router.all('*', () => new Response('Not Found or Method Not Allowed', { status: 
 
 export default {
 	fetch: (request, env, ctx) =>
-		router
-			.handle(request, env, ctx)
+		request.url.startsWith('/v1') // only handle requests to /v1
+			? router
+					.handle(request, env, ctx)
 
-			// catch any errors
-			.catch(e => {
-				console.error(e);
-				return error(e);
-			})
+					// catch any errors
+					.catch(e => {
+						console.error(e);
+						return error(e);
+					})
 
-			// add CORS headers to all requests,
-			// including errors
-			.then(corsify),
+					// add CORS headers to all requests,
+					// including errors
+					.then(corsify)
+			: error(404, 'Not Found'), // not a request to /v1
 };
