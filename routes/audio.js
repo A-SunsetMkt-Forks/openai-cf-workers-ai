@@ -14,7 +14,7 @@ export const transcriptionHandler = async (request, env) => {
 			const input = {
 				audio: [...new Uint8Array(blob)],
 			};
-			const resp = await env.AI.run(model, input);
+			const resp = await env.AI.run(model, input, { gateway: { id: env.CLOUDFLARE_GATEWAY_ID } });
 			return Response.json({
 				text: resp.text,
 			});
@@ -58,27 +58,35 @@ export const translationHandler = async (request, env) => {
 			const input = {
 				audio: [...new Uint8Array(blob)],
 			};
-			const resp = await env.AI.run(model, input);
+			const resp = await env.AI.run(model, input, { gateway: { id: env.CLOUDFLARE_GATEWAY_ID } });
 
-			const language_id_resp = await env.AI.run('@cf/meta/llama-2-7b-chat-int8', {
-				messages: [
-					{
-						role: 'user',
-						content:
-							"Output one of the following: english, chinese, french, spanish, arabic, russian, german, japanese, portuguese, hindi. Identify the following languages.\nQ:'Hola mi nombre es brian y el tuyo?'",
-					},
-					{ role: 'assistant', content: 'spanish' },
-					{ role: 'user', content: 'Was für ein schönes Baby!' },
-					{ role: 'assistant', content: 'german' },
-					{ role: 'user', content: resp.text },
-				],
-			});
+			const language_id_resp = await env.AI.run(
+				'@cf/meta/llama-2-7b-chat-int8',
+				{
+					messages: [
+						{
+							role: 'user',
+							content:
+								"Output one of the following: english, chinese, french, spanish, arabic, russian, german, japanese, portuguese, hindi. Identify the following languages.\nQ:'Hola mi nombre es brian y el tuyo?'",
+						},
+						{ role: 'assistant', content: 'spanish' },
+						{ role: 'user', content: 'Was für ein schönes Baby!' },
+						{ role: 'assistant', content: 'german' },
+						{ role: 'user', content: resp.text },
+					],
+				},
+				{ gateway: { id: env.CLOUDFLARE_GATEWAY_ID } }
+			);
 
-			const translation_resp = await env.AI.run('@cf/meta/m2m100-1.2b', {
-				text: resp.text,
-				source_lang: getLanguageId(language_id_resp.response),
-				target_lang: 'english',
-			});
+			const translation_resp = await env.AI.run(
+				'@cf/meta/m2m100-1.2b',
+				{
+					text: resp.text,
+					source_lang: getLanguageId(language_id_resp.response),
+					target_lang: 'english',
+				},
+				{ gateway: { id: env.CLOUDFLARE_GATEWAY_ID } }
+			);
 
 			if (!translation_resp.translated_text) {
 				console.log({ translation_resp });

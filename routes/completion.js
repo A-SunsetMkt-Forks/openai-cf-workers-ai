@@ -22,7 +22,11 @@ export const completionHandler = async (request, env) => {
 				}
 			}
 			// for now, nothing else does anything. Load the ai model.
-			const aiResp = await env.AI.run(model, { prompt: json.prompt });
+			const aiResp = await env.AI.run(
+				model,
+				{ prompt: json.prompt },
+				{ gateway: { id: env.CLOUDFLARE_GATEWAY_ID } }
+			);
 			return Response.json({
 				id: uuid,
 				model,

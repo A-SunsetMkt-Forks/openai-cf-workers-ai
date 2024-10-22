@@ -53,7 +53,7 @@ export const chatHandler = async (request, env) => {
 								console.log(content);
 								const doneflag = content.trim() == '[DONE]';
 								if (doneflag) {
-									controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+									controller.enqueue(encoder.encode('data: [DONE]\n\n'));
 									return;
 								}
 
@@ -84,35 +84,41 @@ export const chatHandler = async (request, env) => {
 			});
 
 			// for now, nothing else does anything. Load the ai model.
-			const aiResp = await env.AI.run(model, { stream: json.stream, messages });
-			// Piping the readableStream through the transformStream
-			return json.stream ? new Response(aiResp.pipeThrough(transformer), {
-				headers: {
-					'content-type': 'text/event-stream',
-					'Cache-Control': 'no-cache',
-					'Connection': 'keep-alive',
-				},
-			}) : Response.json({
-				id: uuid,
+			const aiResp = await env.AI.run(
 				model,
-				created,
-				object: 'chat.completion',
-				choices: [
-					{
-						index: 0,
-						message: {
-							role: 'assistant',
-							content: aiResp.response,
+				{ stream: json.stream, messages },
+				{ gateway: { id: env.CLOUDFLARE_GATEWAY_ID } }
+			);
+			// Piping the readableStream through the transformStream
+			return json.stream
+				? new Response(aiResp.pipeThrough(transformer), {
+						headers: {
+							'content-type': 'text/event-stream',
+							'Cache-Control': 'no-cache',
+							'Connection': 'keep-alive',
 						},
-						finish_reason: 'stop',
-					},
-				],
-				usage: {
-					prompt_tokens: 0,
-					completion_tokens: 0,
-					total_tokens: 0,
-				},
-			});
+				  })
+				: Response.json({
+						id: uuid,
+						model,
+						created,
+						object: 'chat.completion',
+						choices: [
+							{
+								index: 0,
+								message: {
+									role: 'assistant',
+									content: aiResp.response,
+								},
+								finish_reason: 'stop',
+							},
+						],
+						usage: {
+							prompt_tokens: 0,
+							completion_tokens: 0,
+							total_tokens: 0,
+						},
+				  });
 		}
 	} catch (e) {
 		error = e;

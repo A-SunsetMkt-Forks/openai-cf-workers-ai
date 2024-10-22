@@ -9,9 +9,13 @@ export const embeddingsHandler = async (request, env) => {
 			// 	model = json.model;
 			// }
 
-			const embeddings = await env.AI.run(model, {
-				text: json.input,
-			});
+			const embeddings = await env.AI.run(
+				model,
+				{
+					text: json.input,
+				},
+				{ gateway: { id: env.CLOUDFLARE_GATEWAY_ID } }
+			);
 
 			return Response.json({
 				object: 'list',

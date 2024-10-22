@@ -6,5 +6,6 @@ compatibility_date = "2024-05-06"
 binding = "AI" # i.e. available in your Worker on env.AI
 
 [vars]
-CLOUDFLARE_ACCOUNT_ID = "c8c30db3dddc4ad31065d336368c7905" # replace with your own.
+CLOUDFLARE_ACCOUNT_ID = "" # replace with your own.
+CLOUDFLARE_GATEWAY_ID = "openai-cf-workers-ai" # replace with your own.
 MODEL_MAPPER = { "gpt-3.5-turbo" = "@cf/meta/llama-2-7b-chat-int8" } # Optional
