@@ -56,7 +56,7 @@ router.all('*', () => new Response('Not Found or Method Not Allowed', { status: 
 
 export default {
 	fetch: (request, env, ctx) =>
-		request.url.startsWith('/v1') // only handle requests to /v1
+		request.url.includes('/v1')
 			? router
 					.handle(request, env, ctx)
 
