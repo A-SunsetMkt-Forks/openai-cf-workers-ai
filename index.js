@@ -5,7 +5,7 @@ import { chatHandler } from './routes/chat';
 import { completionHandler } from './routes/completion';
 import { embeddingsHandler } from './routes/embeddings';
 import { transcriptionHandler, translationHandler } from './routes/audio';
-import { getImageHandler, imageGenerationHandler } from './routes/image';
+import { imageGenerationHandler } from './routes/image';
 import { modelsHandler } from './routes/models';
 
 const { preflight, corsify } = createCors();
@@ -45,7 +45,6 @@ router
 	.post('/audio/transcriptions', transcriptionHandler)
 	.post('/audio/translations', translationHandler)
 	.post('/images/generations', imageGenerationHandler)
-	.get('/images/get/:name', getImageHandler)
 	.get('/models', modelsHandler);
 
 // 404 for everything else

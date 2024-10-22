@@ -64,7 +64,6 @@ Next, install the dependencies and deploy to your account. If you are not logged
 
 ```bash
 yarn
-yarn init-prod # only needs run the first time!!!
 yarn deploy
 ```
 
