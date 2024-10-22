@@ -24,6 +24,10 @@ function extractToken(authorizationHeader) {
 }
 // MIDDLEWARE: withAuthenticatedUser - embeds user in Request or returns a 401
 const bearerAuthentication = (request, env) => {
+	// if env.ACCESS_TOKEN unset, pass
+	if (!env.ACCESS_TOKEN) {
+		return;
+	}
 	const authorizationHeader = request.headers.get('Authorization');
 	if (!authorizationHeader) {
 		return error(401, 'Unauthorized');
@@ -48,7 +52,7 @@ router
 	.get('/models', modelsHandler);
 
 // 404 for everything else
-router.all('*', () => new Response('404, not found!', { status: 404 }));
+router.all('*', () => new Response('Not Found or Method Not Allowed', { status: 404 }));
 
 export default {
 	fetch: (request, env, ctx) =>
